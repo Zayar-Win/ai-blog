@@ -1,103 +1,195 @@
+import BlogSlider from "@/components/BlogSlider";
+import { Badge } from "@/components/ui/badge";
+import AppLayout from "@/layouts/AppLayout";
+import db from "@/lib/db";
 import Image from "next/image";
+import moment from "moment";
+import BlogCard from "@/components/BlogCard";
 
-export default function Home() {
+export default async function Home() {
+  const slideBlogs = await db.blog.findMany({
+    take: 3,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      content: true,
+      coverImageUrl: true,
+      metaTitle: true,
+      metaDescription: true,
+      categoryId: true,
+      metaKeywords: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      tags: {
+        select: {
+          tag: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  const latestBlogs = await db.blog.findMany({
+    take: 5,
+    skip: 3,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      content: true,
+      coverImageUrl: true,
+      metaTitle: true,
+      metaDescription: true,
+      categoryId: true,
+      metaKeywords: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      tags: true,
+    },
+  });
+  const mostPopularBlogs = await db.blog.findMany({
+    take: 6,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      content: true,
+      coverImageUrl: true,
+      metaTitle: true,
+      metaDescription: true,
+      categoryId: true,
+      metaKeywords: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: {
+      views: "desc",
+    },
+  });
+  const blogsCount = await db.blog.count();
+  const skip = Math.max(0, Math.floor(Math.random() * blogsCount) - 6);
+  const randomBlogs = await db.blog.findMany({
+    take: 6,
+    skip: skip,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      content: true,
+      coverImageUrl: true,
+      metaTitle: true,
+      metaDescription: true,
+      categoryId: true,
+      metaKeywords: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  });
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+    <AppLayout>
+      <BlogSlider blogs={slideBlogs} />
+      <div className="flex items-center mt-[100px] gap-[40px]">
+        <div className="w-[60%]">
+          <Image
+            src={latestBlogs[0].coverImageUrl as string}
+            alt={latestBlogs[0].title}
+            width={100}
+            className="w-full h-auto object-cover rounded-lg"
+            height={100}
+          />
+          <p
+            className="blog-content mt-[20px]"
+            dangerouslySetInnerHTML={{
+              __html: latestBlogs[0].content.substring(0, 300) + "...",
+            }}
+          />
+          <div className="flex items-center gap-2 mt-5">
             <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+              src={
+                "https://img.freepik.com/premium-psd/happy-robot-3d-ai-character-chat-bot-mascot-gpt-chatbot-icon-artificial-intelligence_95505-482.jpg?semt=ais_hybrid&w=740"
+              }
+              alt=""
+              className="w-[40px] h-[40px] rounded-lg"
+              width={100}
+              height={100}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            <p className="text-sm font-bold">Ai</p>
+            <Badge variant={"secondary"} className="bg-violet-400 text-white">
+              {latestBlogs[0]?.category?.name}
+            </Badge>
+            <p className="text-sm text-secondary">
+              {moment(latestBlogs[0].createdAt).format("MMM d, YYYY")}
+            </p>
+            <div className="w-[6px] h-[6px] bg-secondary rounded-full"></div>
+            <div className="text-sm text-secondary">8min</div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+        <div className="w-[40%] flex flex-col gap-8">
+          {latestBlogs.splice(1).map((blog) => (
+            <div key={blog.id} className="flex items-center gap-5">
+              <Image
+                className="w-[45%] h-auto shrink-0 rounded-md"
+                src={blog.coverImageUrl as string}
+                alt={blog.title}
+                width={100}
+                height={100}
+              />
+              <div className="">
+                <p className="text-xl font-bold line-clamp-2">{blog.title}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <p className="text-sm text-secondary">
+                    {moment(blog.createdAt).format("MMM D,YYYY")}
+                  </p>
+                  <div className="w-[6px] h-[6px] bg-secondary rounded-full"></div>
+                  <p className="text-sm text-secondary">8min</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-[80px]">
+        <p className="text-2xl font-black">Most Popular Blogs</p>
+        <div className="mt-[60px] grid gap-y-8 grid-cols-3 gap-5">
+          {mostPopularBlogs.map((blog) => (
+            <BlogCard key={blog.id} blog={blog} />
+          ))}
+        </div>
+      </div>
+      <div className="mt-[80px]">
+        <p className="text-2xl font-black">Random Blogs</p>
+        <div className="mt-[30px] grid gap-y-8 grid-cols-3 gap-5">
+          {randomBlogs.map((blog) => (
+            <BlogCard key={blog.id} blog={blog} />
+          ))}
+        </div>
+      </div>
+    </AppLayout>
   );
 }
