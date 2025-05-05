@@ -10,8 +10,8 @@ type Props = {
   blog: Blog & {
     category: {
       name: string;
-      id: string;
-    };
+      id: number;
+    } | null;
   };
 };
 
@@ -28,7 +28,7 @@ const BlogCard = ({ blog }: Props) => {
         />
         <div className="flex mt-3 items-center justify-between">
           <Badge className="bg-violet-400 text-white">
-            {blog.category.name}
+            {blog?.category?.name}
           </Badge>
           <div className="flex items-center gap-2 text-xs text-secondary">
             <p>{moment(blog.createdAt).format("MMM DD, YYYY")}</p>

@@ -4,16 +4,16 @@ import Swiper from "./ui/swiper";
 import { SwiperSlide } from "swiper/react";
 import { Badge } from "./ui/badge";
 import Image from "next/image";
-import { Blog } from "@/generated/prisma";
 import Link from "next/link";
 import { routes } from "@/lib/routes";
+import { Blog } from "@/generated/prisma";
 
 type Props = {
   blogs: (Blog & {
     category: {
-      id: string;
+      id: number;
       name: string;
-    };
+    } | null;
   })[];
 };
 
@@ -33,7 +33,7 @@ const BlogSlider = ({ blogs }: Props) => {
                   variant={"secondary"}
                   className="bg-violet-400 text-white"
                 >
-                  {blog.category.name}
+                  {blog?.category?.name}
                 </Badge>
                 <Link
                   href={routes.BLOG_DETAIL(encodeURIComponent(blog.slug))}

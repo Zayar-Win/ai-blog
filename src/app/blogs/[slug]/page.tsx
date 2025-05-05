@@ -8,9 +8,9 @@ import Link from "next/link";
 import React from "react";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export async function generateStaticParams() {
@@ -68,6 +68,7 @@ const Page = async ({ params }: Props) => {
       metaKeywords: true,
       createdAt: true,
       updatedAt: true,
+      views: true,
       category: {
         select: {
           id: true,

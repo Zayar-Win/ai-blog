@@ -6,7 +6,7 @@ import Image from "next/image";
 import moment from "moment";
 import BlogCard from "@/components/BlogCard";
 
-export default async function Home() {
+export default async function Page() {
   const slideBlogs = await db.blog.findMany({
     take: 3,
     select: {
@@ -19,17 +19,13 @@ export default async function Home() {
       metaDescription: true,
       categoryId: true,
       metaKeywords: true,
+      views: true,
       createdAt: true,
       updatedAt: true,
       category: {
         select: {
           id: true,
           name: true,
-        },
-      },
-      tags: {
-        select: {
-          tag: true,
         },
       },
     },
@@ -51,6 +47,7 @@ export default async function Home() {
       categoryId: true,
       metaKeywords: true,
       createdAt: true,
+      views: true,
       updatedAt: true,
       category: {
         select: {
@@ -73,6 +70,7 @@ export default async function Home() {
       metaDescription: true,
       categoryId: true,
       metaKeywords: true,
+      views: true,
       createdAt: true,
       updatedAt: true,
       category: {
@@ -103,6 +101,7 @@ export default async function Home() {
       metaKeywords: true,
       createdAt: true,
       updatedAt: true,
+      views: true,
       category: {
         select: {
           id: true,
